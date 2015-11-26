@@ -34,7 +34,8 @@ angular.module('angularLazyImg').factory('LazyImgMagic', [
     function checkImages(){
       for(var i = images.length - 1; i >= 0; i--){
         var image = images[i];
-        if(image && lazyImgHelpers.isElementInView(image.$elem[0], options.offset, winDimensions)){
+        var visible = image.$elem.is && image.$elem.is(':visible');
+        if(image && visible && lazyImgHelpers.isElementInView(image.$elem[0], options.offset, winDimensions)){
           loadImage(image);
           images.splice(i, 1);
         }
