@@ -59,12 +59,20 @@ angular.module('angularLazyImg').factory('LazyImgMagic', [
       setTimeout(function(){
         checkImages();
         listen('on');
+        onHeightChange($window.document.body, checkImagesT);
+        containers.forEach(function(container) {
+          onHeightChange(container[0], checkImagesT);
+        });
       }, 1);
     }
 
     function stopListening(){
       isListening = false;
       listen('off');
+      offHeightChange($window.document.body);
+      containers.forEach(function(container) {
+        offHeightChange(container[0]);
+      });
     }
 
     function removeImage(image){
@@ -100,6 +108,27 @@ angular.module('angularLazyImg').factory('LazyImgMagic', [
       } else {
         $elem.css('background-image', 'url("' + src + '")');
       }
+    }
+
+    function onHeightChange(elm, callback){
+      var lastHeight = elm.clientHeight, newHeight;
+      (function run(){
+        newHeight = elm.clientHeight;
+        if( lastHeight != newHeight ) {
+          callback();
+        }
+        lastHeight = newHeight;
+
+        if( elm.onHeightChangeTimer ) {
+          clearTimeout(elm.onHeightChangeTimer);
+        }
+        elm.onHeightChangeTimer = setTimeout(run, 200);
+      })();
+    }
+
+    function offHeightChange(elm) {
+      clearTimeout(elm.onHeightChangeTimer);
+      delete elm.onHeightChangeTimer;
     }
 
     // PHOTO
